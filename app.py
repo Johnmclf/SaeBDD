@@ -7,13 +7,14 @@ message = "vide"
 # Demander à l'utilisateur d'entrer un message
 message = st.text_input('Entrez votre message ici')
 
-if(message != "vide"):
+if message:
     # Afficher le message
     st.write('Vous avez écrit : ', message)
 
-    # Ouvrir le fichier JSON et charger les données
-    with open(message, 'r') as f:
-        data = json.load(f)
+
+# Ouvrir le fichier JSON et charger les données
+with open(message, 'r') as f:
+    data = json.load(f)
 
 
 # Ouvrir le fichier JSON et charger les données
