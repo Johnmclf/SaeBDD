@@ -18,6 +18,6 @@ with open('test.json', 'r') as f:
 # Convertir les données en DataFrame
 df = pd.DataFrame(data)
 
-print(df)
+st.write(df)
 
 #normalement on touve la ligne on la modifie et on le renvoie 
