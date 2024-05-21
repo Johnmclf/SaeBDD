@@ -13,8 +13,9 @@ if message:
 
 
 # Ouvrir le fichier JSON et charger les données
-with open(message, 'r') as f:
-    data = json.load(f)
+if message:
+    with open(message, 'r') as f:
+        data = json.load(f)
 
 
 # Ouvrir le fichier JSON et charger les données
