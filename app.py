@@ -6,18 +6,17 @@ import json
 uploaded_file = st.file_uploader("Choisissez un fichier JSON", type="json")
 
 if uploaded_file is not None:
-    # Lire les données du fichier
-    data = json.load(uploaded_file)
+    try:
+        # Lire les données du fichier
+        data = json.load(uploaded_file)
 
-    # Convertir les données en DataFrame
-    df = pd.DataFrame(data)
+        # Convertir les données en DataFrame
+        df = pd.DataFrame(data)
 
-    # Afficher le DataFrame original
-    st.write('DataFrame original :')
-    st.write(df)
+        # Afficher le DataFrame original
+        st.write('DataFrame original :')
+        st.write(df)
 
-    # Boucle pour permettre à l'utilisateur de faire plusieurs modifications
-    while True:
         # Demander à l'utilisateur s'il veut faire une modification
         modify = st.button('Voulez-vous faire une modification ?')
 
@@ -28,15 +27,20 @@ if uploaded_file is not None:
             # Demander à l'utilisateur d'entrer le nom de la colonne à modifier
             column_name = st.text_input('Entrez le nom de la colonne à modifier')
 
-            # Demander à l'utilisateur d'entrer la nouvelle valeur
-            new_value = st.text_input('Entrez la nouvelle valeur')
+            # Vérifier si le nom de la colonne existe dans le DataFrame
+            if column_name in df.columns:
+                # Demander à l'utilisateur d'entrer la nouvelle valeur
+                new_value = st.text_input('Entrez la nouvelle valeur')
 
-            if st.button('Appliquer les modifications'):
-                # Modifier la valeur dans le DataFrame
-                df.loc[row_index, column_name] = new_value
+                if st.button('Appliquer les modifications'):
+                    # Modifier la valeur dans le DataFrame
+                    df.loc[row_index, column_name] = new_value
 
-                # Afficher le DataFrame modifié
-                st.write('DataFrame modifié :')
-                st.write(df)
-        else:
-            break
+                    # Afficher le DataFrame modifié
+                    st.write('DataFrame modifié :')
+                    st.write(df)
+            else:
+                st.write('Erreur : Le nom de la colonne n\'existe pas dans le DataFrame.')
+    except Exception as e:
+        st.write('Une erreur s\'est produite lors de la lecture du fichier JSON ou de la modification du DataFrame.')
+        st.write('Détails de l\'erreur :', str(e))
