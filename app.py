@@ -3,21 +3,17 @@ import pandas as pd
 import numpy as np
 import json
 
-#recuperer le tableau grace a un fichier 
-#modifier a partir d'un numero de ligne (exemple ligne 159)
-#modifier a partir d'un sting (exemple lio retourn lion,lionne,...)
+# Demander à l'utilisateur d'entrer un message
+message = st.text_input('Entrez votre message ici')
 
-#Simplifier la modification 
-#permettre de rajouter des donnees a la fin
-
+# Afficher le message
+st.write('Vous avez écrit : ', message)
 
 # Ouvrir le fichier JSON et charger les données
-with open('test.json', 'r') as f:
+with open(message, 'r') as f:
     data = json.load(f)
 
 # Convertir les données en DataFrame
 df = pd.DataFrame(data)
 
 st.write(df)
-
-#normalement on touve la ligne on la modifie et on le renvoie 
