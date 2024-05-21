@@ -1,16 +1,10 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import json
 
-message = st.text_input('Entrez votre message ici')
+uploaded_file = st.file_uploader("Choisissez un fichier JSON", type="json")
 
-if message:
-    st.write('Vous avez écrit : ', message)
-
-
-if message:
-    with open(message, 'r') as f:
-        data = json.load(f)
-        df = pd.DataFrame(data)
-        st.write(df)
+if uploaded_file is not None:
+    data = json.load(uploaded_file)
+    df = pd.DataFrame(data)
+    st.write(df)
