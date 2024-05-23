@@ -26,10 +26,17 @@ if uploaded_file is not None:
     if add_modification:
         st.session_state.modifications.append((row_index, column_name, new_value))
 
-    # Afficher la liste des modifications en attente
+    # Afficher la liste des modifications en attente avec des boutons pour les supprimer
     st.write('Modifications en attente :')
-    for mod in st.session_state.modifications:
-        st.write(f"Ligne {mod[0]}, Colonne '{mod[1]}', Nouvelle valeur : {mod[2]}")
+    for i, mod in enumerate(st.session_state.modifications):
+        row_index, column_name, new_value = mod
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            st.write(f"Ligne {row_index}, Colonne '{column_name}', Nouvelle valeur : {new_value}")
+        with col2:
+            if st.button('Supprimer', key=f'delete_{i}'):
+                st.session_state.modifications.pop(i)
+                st.experimental_rerun()
 
     # Bouton pour appliquer les modifications
     if st.button('Appliquer toutes les modifications'):
@@ -41,3 +48,4 @@ if uploaded_file is not None:
         
         # Réinitialiser la liste des modifications
         st.session_state.modifications = []
+
