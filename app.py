@@ -92,8 +92,9 @@ if uploaded_file is not None:
                 new_row_data = {}
                 for column_name in df.columns:
                     new_row_data[column_name] = st.text_input(f'Valeur pour la colonne "{column_name}"')
+                new_row_index = len(df)
                 df = df.append(new_row_data, ignore_index=True)
-                st.write('Nouvelle ligne ajoutée :')
+                st.write(f'Nouvelle ligne ajoutée à l\'index {new_row_index} :')
                 st.write(df)
 
         with col5:
