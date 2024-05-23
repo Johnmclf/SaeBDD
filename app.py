@@ -72,7 +72,7 @@ if uploaded_file is not None:
             if st.button("Ajouter Signature"):
                 if user_name:
                     signature = f"Modifié par {user_name} le {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-                    df['Signature'] = signature
+                    df.at[0, 'Signature'] = signature
                     st.write('DataFrame avec signature :')
                     st.write(df)
                 else:
@@ -85,7 +85,20 @@ if uploaded_file is not None:
                 st.experimental_rerun()
 
         # Expander pour les options de téléchargement
-        with st.expander("Télécharger les modifications"):
+        with st.expander("Télécharger les modifications", expanded=True):
+            st.markdown(
+                """
+                <style>
+                .small-button button {
+                    font-size: 0.8em !important;
+                    padding: 0.25em 0.5em !important;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True
+            )
+            st.markdown('<div class="small-button">', unsafe_allow_html=True)
+
             modified_json = df.to_json(orient='records', indent=2)
             modified_csv = df.to_csv(index=False).encode('utf-8')
 
@@ -111,3 +124,5 @@ if uploaded_file is not None:
                 file_name="modified_data.parquet",
                 mime="application/octet-stream"
             )
+
+            st.markdown('</div>', unsafe_allow_html=True)
