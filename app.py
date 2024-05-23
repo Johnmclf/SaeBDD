@@ -4,18 +4,6 @@ import json
 import io
 from datetime import datetime
 
-st.markdown(
-    """
-    <style>
-    .small-button button {
-        font-size: 0.8em !important;
-        padding: 0.25em 0.5em !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
 # Fonction pour lire les différents types de fichiers
 def load_file(file):
     if file.name.endswith('.json'):
@@ -96,8 +84,28 @@ if uploaded_file is not None:
                     st.session_state.modifications = []
                 st.experimental_rerun()
 
+        # Boutons pour ajouter une ligne ou une colonne
+        col4, col5 = st.columns([1, 1])
+        
+        with col4:
+            if st.button('Créer une ligne'):
+                empty_row = pd.Series([None] * len(df.columns), index=df.columns)
+                df = df.append(empty_row, ignore_index=True)
+                st.write('Nouvelle ligne ajoutée :')
+                st.write(df)
+
+        with col5:
+            new_column_name = st.text_input('Nom de la nouvelle colonne')
+            if st.button('Créer une colonne'):
+                if new_column_name:
+                    df[new_column_name] = None
+                    st.write(f'Nouvelle colonne "{new_column_name}" ajoutée :')
+                    st.write(df)
+                else:
+                    st.error("Veuillez entrer un nom pour la nouvelle colonne.")
+
         # Expander pour les options de téléchargement
-        with st.expander("Télécharger les modifications", expanded=True):
+        with st.expander("Télécharger les modifications", expanded=False):
             st.markdown(
                 """
                 <style>
