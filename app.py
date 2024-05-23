@@ -48,4 +48,14 @@ if uploaded_file is not None:
         
         # Réinitialiser la liste des modifications
         st.session_state.modifications = []
-
+        
+        # Conversion du DataFrame modifié en JSON
+        modified_json = df.to_json(orient='records', indent=2)
+        
+        # Bouton pour télécharger le fichier JSON modifié
+        st.download_button(
+            label="Télécharger les modifications en JSON",
+            data=modified_json,
+            file_name="modified_data.json",
+            mime="application/json"
+        )
