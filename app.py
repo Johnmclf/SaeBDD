@@ -1,3 +1,7 @@
+import streamlit as st
+import pandas as pd
+import json
+
 # Téléchargement du fichier JSON
 uploaded_file = st.file_uploader("Choisissez un fichier JSON", type="json")
 
