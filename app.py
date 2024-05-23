@@ -18,7 +18,7 @@ if uploaded_file is not None:
     # Saisie de la modification
     with st.form(key='modification_form'):
         row_index = st.number_input('Entrez l\'index de la ligne à modifier', min_value=0, max_value=len(df)-1, step=1)
-        column_name = st.text_input('Entrez le nom de la colonne à modifier')
+        column_name = st.selectbox('Choisissez le nom de la colonne à modifier', df.columns)
         new_value = st.text_input('Entrez la nouvelle valeur')
         add_modification = st.form_submit_button('Ajouter la modification')
     
@@ -59,3 +59,4 @@ if uploaded_file is not None:
             file_name="modified_data.json",
             mime="application/json"
         )
+
