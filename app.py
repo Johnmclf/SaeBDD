@@ -71,22 +71,23 @@ if uploaded_file is not None:
             df.to_parquet(buffer, index=False)
             modified_parquet = buffer.getvalue()
 
-            # Boutons pour télécharger les fichiers modifiés
-            st.download_button(
-                label="Télécharger les modifications en JSON",
-                data=modified_json,
-                file_name="modified_data.json",
-                mime="application/json"
-            )
-            st.download_button(
-                label="Télécharger les modifications en CSV",
-                data=modified_csv,
-                file_name="modified_data.csv",
-                mime="text/csv"
-            )
-            st.download_button(
-                label="Télécharger les modifications en Parquet",
-                data=modified_parquet,
-                file_name="modified_data.parquet",
-                mime="application/octet-stream"
-            )
+            # Expander pour les options de téléchargement
+            with st.expander("Télécharger les modifications"):
+                st.download_button(
+                    label="Télécharger en JSON",
+                    data=modified_json,
+                    file_name="modified_data.json",
+                    mime="application/json"
+                )
+                st.download_button(
+                    label="Télécharger en CSV",
+                    data=modified_csv,
+                    file_name="modified_data.csv",
+                    mime="text/csv"
+                )
+                st.download_button(
+                    label="Télécharger en Parquet",
+                    data=modified_parquet,
+                    file_name="modified_data.parquet",
+                    mime="application/octet-stream"
+                )
