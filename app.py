@@ -92,15 +92,17 @@ if uploaded_file is not None:
                 new_row_data = {}
                 for column_name in df.columns:
                     new_row_data[column_name] = st.text_input(f'Valeur pour la colonne "{column_name}"')
+                new_row_index = len(df)
                 df = df.append(new_row_data, ignore_index=True)
-                st.write('Nouvelle ligne ajoutée :')
+                st.write(f'Nouvelle ligne ajoutée à l\'index {new_row_index} :')
                 st.write(df)
 
         with col5:
             new_column_name = st.text_input('Nom de la nouvelle colonne')
             if st.button('Créer une colonne'):
                 if new_column_name:
-                    df.insert(df.columns.get_loc('Signature'), new_column_name, None)
+                    signature_index = df.columns.get_loc('Signature')
+                    df.insert(signature_index, new_column_name, None)
                     st.write(f'Nouvelle colonne "{new_column_name}" ajoutée avant la colonne "Signature" :')
                     st.write(df)
                 else:
