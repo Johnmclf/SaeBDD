@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import json
+import io
 
 # Téléchargement du fichier JSON
 uploaded_file = st.file_uploader("Choisissez un fichier JSON", type="json")
@@ -48,15 +49,33 @@ if uploaded_file is not None:
         
         # Réinitialiser la liste des modifications
         st.session_state.modifications = []
-        
-        # Conversion du DataFrame modifié en JSON
+
+        # Conversion du DataFrame modifié en différents formats
         modified_json = df.to_json(orient='records', indent=2)
+        modified_csv = df.to_csv(index=False).encode('utf-8')
         
-        # Bouton pour télécharger le fichier JSON modifié
+        buffer = io.BytesIO()
+        df.to_parquet(buffer, index=False)
+        modified_parquet = buffer.getvalue()
+
+        # Boutons pour télécharger les fichiers modifiés
         st.download_button(
             label="Télécharger les modifications en JSON",
             data=modified_json,
             file_name="modified_data.json",
             mime="application/json"
         )
+        st.download_button(
+            label="Télécharger les modifications en CSV",
+            data=modified_csv,
+            file_name="modified_data.csv",
+            mime="text/csv"
+        )
+        st.download_button(
+            label="Télécharger les modifications en Parquet",
+            data=modified_parquet,
+            file_name="modified_data.parquet",
+            mime="application/octet-stream"
+        )
+
 
