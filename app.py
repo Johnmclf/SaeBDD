@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import json
 import io
+from datetime import datetime
 
 # Fonction pour lire les différents types de fichiers
 def load_file(file):
@@ -52,42 +53,61 @@ if uploaded_file is not None:
                     st.session_state.modifications.pop(i)
                     st.experimental_rerun()
 
-        # Bouton pour appliquer les modifications
-        if st.button('Appliquer toutes les modifications'):
-            for mod in st.session_state.modifications:
-                row_index, column_name, new_value = mod
-                df.loc[row_index, column_name] = new_value
-            st.write('DataFrame modifié :')
-            st.write(df)
-            
-            # Réinitialiser la liste des modifications
-            st.session_state.modifications = []
+        # Boutons pour les actions de fin
+        col1, col2, col3 = st.columns([1, 1, 1])
 
-            # Conversion du DataFrame modifié en différents formats
+        with col1:
+            if st.button('Appliquer toutes les modifications'):
+                for mod in st.session_state.modifications:
+                    row_index, column_name, new_value = mod
+                    df.loc[row_index, column_name] = new_value
+                st.write('DataFrame modifié :')
+                st.write(df)
+
+                # Réinitialiser la liste des modifications
+                st.session_state.modifications = []
+
+        with col2:
+            user_name = st.text_input("Votre nom")
+            if st.button("Ajouter Signature"):
+                if user_name:
+                    signature = f"Modifié par {user_name} le {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                    df['Signature'] = signature
+                    st.write('DataFrame avec signature :')
+                    st.write(df)
+                else:
+                    st.error("Veuillez entrer votre nom pour ajouter une signature.")
+
+        with col3:
+            if st.button("Réinitialiser"):
+                if 'modifications' in st.session_state:
+                    st.session_state.modifications = []
+                st.experimental_rerun()
+
+        # Expander pour les options de téléchargement
+        with st.expander("Télécharger les modifications"):
             modified_json = df.to_json(orient='records', indent=2)
             modified_csv = df.to_csv(index=False).encode('utf-8')
-            
+
             buffer = io.BytesIO()
             df.to_parquet(buffer, index=False)
             modified_parquet = buffer.getvalue()
 
-            # Expander pour les options de téléchargement
-            with st.expander("Télécharger les modifications"):
-                st.download_button(
-                    label="Télécharger en JSON",
-                    data=modified_json,
-                    file_name="modified_data.json",
-                    mime="application/json"
-                )
-                st.download_button(
-                    label="Télécharger en CSV",
-                    data=modified_csv,
-                    file_name="modified_data.csv",
-                    mime="text/csv"
-                )
-                st.download_button(
-                    label="Télécharger en Parquet",
-                    data=modified_parquet,
-                    file_name="modified_data.parquet",
-                    mime="application/octet-stream"
-                )
+            st.download_button(
+                label="Télécharger en JSON",
+                data=modified_json,
+                file_name="modified_data.json",
+                mime="application/json"
+            )
+            st.download_button(
+                label="Télécharger en CSV",
+                data=modified_csv,
+                file_name="modified_data.csv",
+                mime="text/csv"
+            )
+            st.download_button(
+                label="Télécharger en Parquet",
+                data=modified_parquet,
+                file_name="modified_data.parquet",
+                mime="application/octet-stream"
+            )
