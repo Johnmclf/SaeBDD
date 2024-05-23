@@ -4,6 +4,18 @@ import json
 import io
 from datetime import datetime
 
+st.markdown(
+    """
+    <style>
+    .small-button button {
+        font-size: 0.8em !important;
+        padding: 0.25em 0.5em !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # Fonction pour lire les différents types de fichiers
 def load_file(file):
     if file.name.endswith('.json'):
