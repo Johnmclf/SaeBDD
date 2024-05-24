@@ -30,6 +30,41 @@ if uploaded_file is not None:
         if 'modifications' not in st.session_state:
             st.session_state.modifications = []
 
+        # Boutons pour ajouter une ligne ou une colonne
+        col4, col5 = st.columns([1, 1])
+        
+        with col4:
+            if st.button('Créer une ligne'):
+                new_row_data = {}
+                for column_name in df.columns:
+                    if column_name != 'Signature':  # Ignorer la colonne 'Signature'
+                        if df[column_name].dtype == 'int' or df[column_name].dtype == 'float':
+                            new_row_data[column_name] = 0  # Initialiser à zéro pour les colonnes numériques
+                        else:
+                            new_row_data[column_name] = None  # Initialiser à None pour les autres colonnes
+                    else:
+                        new_row_data[column_name] = ""  # Laisser la colonne 'Signature' vide pour le moment
+        
+                # Créer une nouvelle ligne à partir des données saisies
+                new_row = pd.DataFrame([new_row_data])
+        
+                # Ajouter la nouvelle ligne au DataFrame
+                df = pd.concat([new_row, df], ignore_index=True)
+                
+                st.write('Nouvelle ligne ajoutée :')
+                st.write(df)
+
+        with col5:
+            new_column_name = st.text_input('Nom de la nouvelle colonne')
+            if st.button('Créer une colonne'):
+                if new_column_name:
+                    signature_index = df.columns.get_loc('Signature')
+                    df.insert(signature_index, new_column_name, None)
+                    st.write(f'Nouvelle colonne "{new_column_name}" ajoutée avant la colonne "Signature" :')
+                    st.write(df)
+                else:
+                    st.error("Veuillez entrer un nom pour la nouvelle colonne.")
+
         # Saisie de la modification
         with st.form(key='modification_form'):
             row_index = st.number_input('Entrez l\'index de la ligne à modifier', min_value=0, max_value=len(df)-1, step=1)
@@ -75,7 +110,7 @@ if uploaded_file is not None:
                     df.at[0, 'Signature'] = signature
                     st.write('DataFrame avec signature :')
                     st.write(df)
-                else:
+                            else:
                     st.error("Veuillez entrer votre nom pour ajouter une signature.")
 
         with col3:
@@ -83,41 +118,6 @@ if uploaded_file is not None:
                 if 'modifications' in st.session_state:
                     st.session_state.modifications = []
                 st.experimental_rerun()
-
-        # Boutons pour ajouter une ligne ou une colonne
-        col4, col5 = st.columns([1, 1])
-        
-        with col4:
-            if st.button('Créer une ligne'):
-                new_row_data = {}
-                for column_name in df.columns:
-                    if column_name != 'Signature':  # Ignorer la colonne 'Signature'
-                        if df[column_name].dtype == 'int' or df[column_name].dtype == 'float':
-                            new_row_data[column_name] = 0  # Initialiser à zéro pour les colonnes numériques
-                        else:
-                            new_row_data[column_name] = None  # Initialiser à None pour les autres colonnes
-                    else:
-                        new_row_data[column_name] = ""  # Laisser la colonne 'Signature' vide pour le moment
-        
-                # Créer une nouvelle ligne à partir des données saisies
-                new_row = pd.DataFrame([new_row_data])
-        
-                # Ajouter la nouvelle ligne au DataFrame
-                df = pd.concat([new_row, df], ignore_index=True)
-                
-                st.write('Nouvelle ligne ajoutée :')
-                st.write(df)
-
-        with col5:
-            new_column_name = st.text_input('Nom de la nouvelle colonne')
-            if st.button('Créer une colonne'):
-                if new_column_name:
-                    signature_index = df.columns.get_loc('Signature')
-                    df.insert(signature_index, new_column_name, None)
-                    st.write(f'Nouvelle colonne "{new_column_name}" ajoutée avant la colonne "Signature" :')
-                    st.write(df)
-                else:
-                    st.error("Veuillez entrer un nom pour la nouvelle colonne.")
 
         # Expander pour les options de téléchargement
         with st.expander("Télécharger les modifications", expanded=False):
@@ -133,15 +133,14 @@ if uploaded_file is not None:
                 unsafe_allow_html=True
             )
             st.markdown('<div class="small-button">', unsafe_allow_html=True)
-        
+
             modified_json = df.to_json(orient='records', indent=2)
             modified_csv = df.to_csv(index=False).encode('utf-8')
-        
-            # Utilisation de BytesIO pour la conversion en format Parquet
+
             buffer = io.BytesIO()
             df.to_parquet(buffer, index=False)
             modified_parquet = buffer.getvalue()
-        
+
             st.download_button(
                 label="Télécharger en JSON",
                 data=modified_json,
@@ -160,5 +159,5 @@ if uploaded_file is not None:
                 file_name="modified_data.parquet",
                 mime="application/octet-stream"
             )
-        
+
             st.markdown('</div>', unsafe_allow_html=True)
