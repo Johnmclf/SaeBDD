@@ -87,24 +87,24 @@ if uploaded_file is not None:
         # Boutons pour ajouter une ligne ou une colonne
         col4, col5 = st.columns([1, 1])
         
-       with col4:
-        if st.button('Créer une ligne'):
-            new_row_data = {}
-            for column_name in df.columns:
-                if column_name != 'Signature':  # Ignorer la colonne 'Signature'
-                    new_value = st.text_input(f'Valeur pour la colonne "{column_name}"', key=f'new_row_{column_name}')
-                    new_row_data[column_name] = new_value
-                else:
-                    new_row_data[column_name] = ""  # Laisser la colonne 'Signature' vide pour le moment
-    
-            # Créer une nouvelle ligne à partir des données saisies
-            new_row = pd.DataFrame([new_row_data])
-    
-            # Ajouter la nouvelle ligne au DataFrame
-            df = pd.concat([df, new_row], ignore_index=True)
-            
-            st.write('Nouvelle ligne ajoutée :')
-            st.write(df)
+        with col4:
+            if st.button('Créer une ligne'):
+                new_row_data = {}
+                for column_name in df.columns:
+                    if column_name != 'Signature':  # Ignorer la colonne 'Signature'
+                        new_value = st.text_input(f'Valeur pour la colonne "{column_name}"', key=f'new_row_{column_name}')
+                        new_row_data[column_name] = new_value
+                    else:
+                        new_row_data[column_name] = ""  # Laisser la colonne 'Signature' vide pour le moment
+        
+                # Créer une nouvelle ligne à partir des données saisies
+                new_row = pd.DataFrame([new_row_data])
+        
+                # Ajouter la nouvelle ligne au DataFrame
+                df = pd.concat([df, new_row], ignore_index=True)
+                
+                st.write('Nouvelle ligne ajoutée :')
+                st.write(df)
 
         with col5:
             new_column_name = st.text_input('Nom de la nouvelle colonne')
