@@ -30,30 +30,16 @@ if uploaded_file is not None:
         if 'modifications' not in st.session_state:
             st.session_state.modifications = []
 
-        # Bouton pour ajouter une ligne
-        if st.button('Créer une ligne'):
-            new_row_data = {}
-            for column_name in df.columns:
-                if column_name != 'Signature':  # Ignorer la colonne 'Signature'
-                    if df[column_name].dtype == 'int' or df[column_name].dtype == 'float':
-                        new_row_data[column_name] = 0  # Initialiser à zéro pour les colonnes numériques
-                    else:
-                        new_row_data[column_name] = None
-            # Créer une nouvelle ligne à partir des données saisies
-            new_row = pd.DataFrame([new_row_data])
-            # Ajouter la nouvelle ligne au DataFrame
-            df = pd.concat([new_row, df], ignore_index=True)
-
-            st.write('Nouvelle ligne ajoutée :')
-            st.write(df)
-
         # Saisie de la modification
         with st.form(key='modification_form'):
             row_index = st.number_input('Entrez l\'index de la ligne à modifier', min_value=0, max_value=len(df)-1, step=1)
             column_name = st.selectbox('Choisissez le nom de la colonne à modifier', df.columns)
             new_value = st.text_input('Entrez la nouvelle valeur')
             add_modification = st.form_submit_button('Ajouter la modification')
-        
+
+            # Bouton pour créer une ligne
+            st.form_submit_button('Créer une ligne')
+
         # Ajouter la modification à la liste
         if add_modification:
             st.session_state.modifications.append((row_index, column_name, new_value))
@@ -143,4 +129,3 @@ if uploaded_file is not None:
             )
 
             st.markdown('</div>', unsafe_allow_html=True)
-
