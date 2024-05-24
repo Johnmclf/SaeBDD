@@ -95,8 +95,7 @@ if uploaded_file is not None:
                         if df[column_name].dtype == 'int' or df[column_name].dtype == 'float':
                             new_row_data[column_name] = 0  # Initialiser à zéro pour les colonnes numériques
                         else:
-                            new_value = st.text_input(f'Valeur pour la colonne "{column_name}"', key=f'new_row_{column_name}')
-                            new_row_data[column_name] = new_value
+                            new_row_data[column_name] = None  # Initialiser à None pour les autres colonnes
                     else:
                         new_row_data[column_name] = ""  # Laisser la colonne 'Signature' vide pour le moment
         
@@ -104,7 +103,7 @@ if uploaded_file is not None:
                 new_row = pd.DataFrame([new_row_data])
         
                 # Ajouter la nouvelle ligne au DataFrame
-                df = pd.concat([df, new_row], ignore_index=True)
+                df = pd.concat([new_row, df], ignore_index=True)
                 
                 st.write('Nouvelle ligne ajoutée :')
                 st.write(df)
@@ -131,7 +130,7 @@ if uploaded_file is not None:
                 }
                 </style>
                 """,
-                unsafe_allow_html=True  # Corrigez ici
+                unsafe_allow_html=True
             )
             st.markdown('<div class="small-button">', unsafe_allow_html=True)
         
