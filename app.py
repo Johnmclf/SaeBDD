@@ -96,7 +96,7 @@ if uploaded_file is not None:
                         new_row_data[column_name] = new_value
                     else:
                         new_row_data[column_name] = ""  # Laisser la colonne 'Signature' vide pour le moment
-                
+        
                 df = df.append(new_row_data, ignore_index=True)
                 st.write('Nouvelle ligne ajoutée :')
                 st.write(df)
