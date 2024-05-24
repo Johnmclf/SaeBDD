@@ -110,7 +110,18 @@ if uploaded_file is not None:
                     df.at[0, 'Signature'] = signature
                     st.write('DataFrame avec signature :')
                     st.write(df)
-                            else:
+            else:
+                st.error("Veuillez entrer votre nom pour ajouter une signature.")
+
+               with col2:
+            user_name = st.text_input("Votre nom")
+            if st.button("Ajouter Signature"):
+                if user_name:
+                    signature = f"Modifié par {user_name} le {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                    df.at[0, 'Signature'] = signature
+                    st.write('DataFrame avec signature :')
+                    st.write(df)
+                else:
                     st.error("Veuillez entrer votre nom pour ajouter une signature.")
 
         with col3:
