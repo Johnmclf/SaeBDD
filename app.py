@@ -132,3 +132,41 @@ if uploaded_file is not None:
                 </style>
                 """,
                 unsafe_allow_html
+                st.markdown('<div class="small-button">', unsafe_allow_html=True)
+
+            modified_json = df.to_json(orient='records', indent=2)
+            modified_csv = df.to_csv(index=False).encode('utf-8')
+
+            # Utilisation de BytesIO pour la conversion en format Parquet
+            buffer = io.BytesIO()
+            df.to_parquet(buffer, index=False)
+            modified_parquet = buffer.getvalue()
+
+            st.download_button(
+                label="Télécharger en JSON",
+                data=modified_json,
+                file_name="modified_data.json",
+                mime="application/json"
+            )
+            st.download_button(
+                label="Télécharger en CSV",
+                data=modified_csv,
+                file_name="modified_data.csv",
+                mime="text/csv"
+            )
+            st.download_button(
+                label="Télécharger en Parquet",
+                data=modified_parquet,
+                file_name="modified_data.parquet",
+                mime="application/octet-stream"
+            )
+
+            st.markdown('</div>', unsafe_allow_html=True)
+
+
+
+
+
+
+
+
