@@ -89,15 +89,15 @@ if uploaded_file is not None:
         
         with col4:
             if st.button('Créer une ligne'):
-                new_row_data = []
+                new_row_data = {}
                 for column_name in df.columns:
                     if column_name != 'Signature':  # Ignorer la colonne 'Signature'
                         new_value = st.text_input(f'Valeur pour la colonne "{column_name}"', key=f'new_row_{column_name}')
-                        new_row_data.append(new_value)
+                        new_row_data[column_name] = new_value
                     else:
-                        new_row_data.append("")  # Laisser la colonne 'Signature' vide pour le moment
-                
-                df.loc[len(df)] = new_row_data
+                        new_row_data[column_name] = ""  # Laisser la colonne 'Signature' vide pour le moment
+        
+                df = df.append(new_row_data, ignore_index=True)
                 st.write('Nouvelle ligne ajoutée :')
                 st.write(df)
 
