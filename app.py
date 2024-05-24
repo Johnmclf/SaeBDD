@@ -37,8 +37,14 @@ if uploaded_file is not None:
             new_value = st.text_input('Entrez la nouvelle valeur')
             add_modification = st.form_submit_button('Ajouter la modification')
 
-            # Bouton pour créer une ligne
-            st.form_submit_button('Créer une ligne')
+        # Si l'index spécifié n'existe pas, ajoute une nouvelle ligne avec les valeurs vides
+        if row_index >= len(df):
+            new_row_data = {}
+            for column_name in df.columns:
+                if column_name != 'Signature':  # Ignorer la colonne 'Signature'
+                    new_row_data[column_name] = ""  # Laisser les nouvelles lignes vides pour le moment
+            df = df.append(new_row_data, ignore_index=True)
+            st.session_state.modifications.append((len(df)-1, None, None))  # Ajouter la nouvelle ligne à la liste des modifications
 
         # Ajouter la modification à la liste
         if add_modification:
@@ -63,7 +69,8 @@ if uploaded_file is not None:
             if st.button('Appliquer toutes les modifications'):
                 for mod in st.session_state.modifications:
                     row_index, column_name, new_value = mod
-                    df.loc[row_index, column_name] = new_value
+                    if row_index < len(df):  # Appliquer la modification seulement si l'index est valide
+                        df.loc[row_index, column_name] = new_value
                 st.write('DataFrame modifié :')
                 st.write(df)
 
