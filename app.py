@@ -17,14 +17,31 @@ def load_file(file):
         st.error("Format de fichier non pris en charge!")
         return None
 
+# Fonction pour ajouter une nouvelle colonne
+def add_column(df, col_name, col_type):
+    if col_type == 'string':
+        df[col_name] = ""
+    elif col_type == 'int':
+        df[col_name] = 0
+    elif col_type == 'float':
+        df[col_name] = 0.0
+    return df
+
+# Fonction pour garantir que 'Signature' reste à la fin
+def ensure_signature_at_end(df):
+    if 'Signature' in df.columns:
+        columns = [col for col in df.columns if col != 'Signature'] + ['Signature']
+        df = df[columns]
+    return df
+
 # Téléchargement du fichier JSON, CSV ou Parquet
 uploaded_file = st.file_uploader("Choisissez un fichier JSON, CSV ou Parquet", type=["json", "csv", "parquet"])
 
 if uploaded_file is not None:
     df = load_file(uploaded_file)
     if df is not None:
-        st.write('DataFrame original :')
-        st.write(df)
+        st.write('### DataFrame original :')
+        st.dataframe(df)
 
         # Initialisation de la liste des modifications
         if 'modifications' not in st.session_state:
@@ -35,13 +52,15 @@ if uploaded_file is not None:
             df = st.session_state.modified_df
 
         # Boutons pour les actions de fin
-        col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+        st.write('### Ajouter des lignes et des colonnes:')
+        col1, col2, col3 = st.columns([1, 1, 1])
 
         with col1:
             if st.button('Ajouter une ligne'):
                 new_row_data = {col: None for col in df.columns if col != 'Signature'}
                 new_row = pd.DataFrame([new_row_data])
                 df = pd.concat([df, new_row], ignore_index=True)
+                df = ensure_signature_at_end(df)
                 st.session_state.modified_df = df.copy()
                 st.experimental_rerun()
 
@@ -49,16 +68,8 @@ if uploaded_file is not None:
             new_col_name = st.text_input('Nom de la nouvelle colonne', key='new_col')
             col_type = st.selectbox('Type de la nouvelle colonne', ['string', 'int', 'float'], key='new_col_type')
             if st.button("Ajouter une colonne") and new_col_name:
-                if col_type == 'string':
-                    df[new_col_name] = ""
-                elif col_type == 'int':
-                    df[new_col_name] = 0
-                elif col_type == 'float':
-                    df[new_col_name] = 0.0
-                # Réorganiser les colonnes pour que 'Signature' reste à la fin
-                if 'Signature' in df.columns:
-                    columns = [col for col in df.columns if col != 'Signature'] + ['Signature']
-                    df = df[columns]
+                df = add_column(df, new_col_name, col_type)
+                df = ensure_signature_at_end(df)
                 st.session_state.modified_df = df.copy()
                 st.experimental_rerun()
 
@@ -66,16 +77,16 @@ if uploaded_file is not None:
             if st.button("Réinitialiser"):
                 if 'modifications' in st.session_state:
                     st.session_state.modifications = []
+                if 'modified_df' in st.session_state:
+                    del st.session_state.modified_df
                 st.experimental_rerun()
 
-        # Afficher le DataFrame avec les nouvelles lignes/colonnes ajoutées
-        if 'modified_df' in st.session_state:
-            df = st.session_state.modified_df
-
-        st.write('DataFrame après ajout de lignes/colonnes :')
-        st.write(df)
+        # Afficher le DataFrame après ajout de lignes/colonnes
+        st.write('### DataFrame après ajout de lignes/colonnes :')
+        st.dataframe(df)
 
         # Saisie de la modification
+        st.write('### Modifications des valeurs:')
         with st.form(key='modification_form'):
             row_index = st.number_input('Entrez l\'index de la ligne à modifier', min_value=0, max_value=len(df)-1, step=1)
             column_name = st.selectbox('Choisissez le nom de la colonne à modifier', df.columns)
@@ -87,7 +98,7 @@ if uploaded_file is not None:
             st.session_state.modifications.append((row_index, column_name, new_value))
 
         # Afficher la liste des modifications en attente avec des boutons pour les supprimer
-        st.write('Modifications en attente :')
+        st.write('### Modifications en attente :')
         for i, mod in enumerate(st.session_state.modifications):
             row_index, column_name, new_value = mod
             col1, col2 = st.columns([3, 1])
@@ -107,8 +118,8 @@ if uploaded_file is not None:
                     row_index, column_name, new_value = mod
                     if row_index < len(df):  # Appliquer la modification seulement si l'index est valide
                         df.loc[row_index, column_name] = new_value
-                st.write('DataFrame modifié :')
-                st.write(df)
+                st.write('### DataFrame modifié :')
+                st.dataframe(df)
 
                 # Sauvegarder le DataFrame modifié sans signature
                 st.session_state.modified_df = df.copy()
@@ -124,8 +135,9 @@ if uploaded_file is not None:
                         df_with_signature = st.session_state.modified_df.copy()
                         signature = f"Modifié par {user_name} le {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
                         df_with_signature.at[0, 'Signature'] = signature
-                        st.write('DataFrame avec signature :')
-                        st.write(df_with_signature)
+                        df_with_signature = ensure_signature_at_end(df_with_signature)
+                        st.write('### DataFrame avec signature :')
+                        st.dataframe(df_with_signature)
                         
                         # Mettre à jour le DataFrame stocké avec la signature
                         st.session_state.modified_df = df_with_signature
@@ -135,7 +147,8 @@ if uploaded_file is not None:
                     st.error("Veuillez entrer votre nom pour ajouter une signature.")
 
         # Expander pour les options de téléchargement
-        with st.expander("Télécharger les modifications", expanded=False):
+        st.write('### Télécharger les modifications :')
+        with st.expander("Options de téléchargement", expanded=False):
             st.markdown(
                 """
                 <style>
@@ -153,27 +166,30 @@ if uploaded_file is not None:
                 modified_json = st.session_state.modified_df.to_json(orient='records', indent=2)
                 modified_csv = st.session_state.modified_df.to_csv(index=False).encode('utf-8')
 
-                buffer = io.BytesIO()
-                st.session_state.modified_df.to_parquet(buffer, index=False)
-                modified_parquet = buffer.getvalue()
+                try:
+                    buffer = io.BytesIO()
+                    st.session_state.modified_df.to_parquet(buffer, index=False)
+                    modified_parquet = buffer.getvalue()
 
-                st.download_button(
-                    label="Télécharger en JSON",
-                    data=modified_json,
-                    file_name="modified_data.json",
-                    mime="application/json"
-                )
-                st.download_button(
-                    label="Télécharger en CSV",
-                    data=modified_csv,
-                    file_name="modified_data.csv",
-                    mime="text/csv"
-                )
-                st.download_button(
-                    label="Télécharger en Parquet",
-                    data=modified_parquet,
-                    file_name="modified_data.parquet",
-                    mime="application/octet-stream"
-                )
+                    st.download_button(
+                        label="Télécharger en JSON",
+                        data=modified_json,
+                        file_name="modified_data.json",
+                        mime="application/json"
+                    )
+                    st.download_button(
+                        label="Télécharger en CSV",
+                        data=modified_csv,
+                        file_name="modified_data.csv",
+                        mime="text/csv"
+                    )
+                    st.download_button(
+                        label="Télécharger en Parquet",
+                        data=modified_parquet,
+                        file_name="modified_data.parquet",
+                        mime="application/octet-stream"
+                    )
+                except Exception as e:
+                    st.error(f"Erreur lors de la conversion en Parquet: {e}")
 
             st.markdown('</div>', unsafe_allow_html=True)
