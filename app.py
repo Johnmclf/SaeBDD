@@ -168,6 +168,11 @@ if uploaded_file is not None:
 
                 try:
                     buffer = io.BytesIO()
+                    # Convertir explicitement les colonnes en types compatibles
+                    for col in st.session_state.modified_df.columns:
+                        if st.session_state.modified_df[col].dtype == 'object':
+                            st.session_state.modified_df[col] = st.session_state.modified_df[col].astype('string')
+
                     st.session_state.modified_df.to_parquet(buffer, index=False)
                     modified_parquet = buffer.getvalue()
 
