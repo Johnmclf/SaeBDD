@@ -4,7 +4,7 @@ import json
 import io
 from datetime import datetime
 
-# Fonction pour lire les différents types de fichiers
+#--------------------------------------------------------Lire les fichiers-----------------------------------------------------------------------(valider)
 def load_file(file):
     if file.name.endswith('.json'):
         data = json.load(file)
@@ -17,6 +17,7 @@ def load_file(file):
         st.error("Format de fichier non pris en charge!")
         return None
 
+#-------------------------------------------------Ajouter une nouvelle colonne-------------------------------------------------------------------(valider)
 # Fonction pour ajouter une nouvelle colonne
 def add_column(df, col_name, col_type):
     if col_type == 'string':
@@ -27,14 +28,14 @@ def add_column(df, col_name, col_type):
         df[col_name] = 0.0
     return df
 
-# Fonction pour garantir que 'Signature' reste à la fin
+#-------------------------------------------------Signature à la fin----------------------------------------------------------------------------
 def ensure_signature_at_end(df):
     if 'Signature' in df.columns:
         columns = [col for col in df.columns if col != 'Signature'] + ['Signature']
         df = df[columns]
     return df
 
-# Téléchargement du fichier JSON, CSV ou Parquet
+#------------------------------------------------Téléchargement du fichier--------------------------------------------------------------------
 uploaded_file = st.file_uploader("Choisissez un fichier JSON, CSV ou Parquet", type=["json", "csv", "parquet"])
 
 if uploaded_file is not None:
@@ -88,7 +89,7 @@ if uploaded_file is not None:
                 st.session_state.modified_df = df.copy()
                 st.experimental_rerun()
 
-        # Afficher le DataFrame après ajout/suppression de lignes/colonnes
+        #-------------------------------------------------------------------Afficher le DataFrame----------------------------------------------------------
         st.write('### DataFrame après modifications :')
         st.dataframe(df)
 
@@ -100,11 +101,11 @@ if uploaded_file is not None:
             new_value = st.text_input('Entrez la nouvelle valeur')
             add_modification = st.form_submit_button('Ajouter la modification')
 
-        # Ajouter la modification à la liste
+        #-----------------------------------------------------------------Ajouter la modification à la liste------------------------------------------------
         if add_modification:
             st.session_state.modifications.append((row_index, column_name, new_value))
 
-        # Afficher la liste des modifications en attente avec des boutons pour les supprimer
+        #---------------------------------------------------------------- Afficher la liste des modifications en attente------------------------------------
         st.write('### Modifications en attente :')
         for i, mod in enumerate(st.session_state.modifications):
             row_index, column_name, new_value = mod
@@ -116,7 +117,7 @@ if uploaded_file is not None:
                     st.session_state.modifications.pop(i)
                     st.experimental_rerun()
 
-        # Boutons pour appliquer les modifications et ajouter la signature
+        #--------------------------------------------------- Appliquer les modifications et la signature--------------------------------------------------
         col1, col2, col3 = st.columns([1, 1, 1])
 
         with col1:
@@ -158,7 +159,7 @@ if uploaded_file is not None:
                     else:
                         st.error("Veuillez entrer votre nom pour ajouter une signature.")
 
-        # Expander pour les options de téléchargement
+        #--------------------------------------------------Options pour télécharger-----------------------------------------------------------
         st.write('### Télécharger les modifications :')
         with st.expander("Options de téléchargement", expanded=False):
             st.markdown(
