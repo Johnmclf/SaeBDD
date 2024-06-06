@@ -117,7 +117,7 @@ if uploaded_file is not None:
                     st.experimental_rerun()
 
         # Boutons pour appliquer les modifications et ajouter la signature
-        col1, col2 = st.columns([1, 1])
+        col1, col2, col3 = st.columns([1, 1, 1])
 
         with col1:
             if st.button('Appliquer toutes les modifications'):
@@ -135,23 +135,28 @@ if uploaded_file is not None:
                 st.session_state.modifications = []
 
         with col2:
-            user_name = st.text_input("Votre nom")
-            if st.button("Ajouter Signature"):
-                if user_name:
-                    if 'modified_df' in st.session_state:
-                        df_with_signature = st.session_state.modified_df.copy()
-                        signature = f"Modifié par {user_name} le {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-                        df_with_signature.at[0, 'Signature'] = signature
-                        df_with_signature = ensure_signature_at_end(df_with_signature)
-                        st.write('### DataFrame avec signature :')
-                        st.dataframe(df_with_signature)
-                        
-                        # Mettre à jour le DataFrame stocké avec la signature
-                        st.session_state.modified_df = df_with_signature
+            if st.button("Réinitialiser les modifications"):
+                if 'modifications' in st.session_state:
+                    st.session_state.modifications = []
+                st.experimental_rerun()
+
+        with col3:
+            with st.expander("Ajouter une signature", expanded=False):
+                user_name = st.text_input("Votre nom")
+                if st.button("Ajouter Signature"):
+                    if user_name:
+                        if 'modified_df' in st.session_state:
+                            df_with_signature = st.session_state.modified_df.copy()
+                            signature = f"Modifié par {user_name} le {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                            df_with_signature.at[0, 'Signature'] = signature
+                            df_with_signature = ensure_signature_at_end(df_with_signature)
+                            st.write('### DataFrame avec signature :')
+                            st.dataframe
+                                st.dataframe(df_with_signature)
+                            else:
+                                st.error("Veuillez appliquer les modifications avant d'ajouter une signature.")
                     else:
-                        st.error("Veuillez appliquer les modifications avant d'ajouter une signature.")
-                else:
-                    st.error("Veuillez entrer votre nom pour ajouter une signature.")
+                        st.error("Veuillez entrer votre nom pour ajouter une signature.")
 
         # Expander pour les options de téléchargement
         st.write('### Télécharger les modifications :')
