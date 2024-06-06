@@ -51,11 +51,10 @@ if uploaded_file is not None:
         if 'modified_df' in st.session_state:
             df = st.session_state.modified_df
 
-        # Boutons pour les actions de fin
-        st.write('### Ajouter ou supprimer des lignes et des colonnes:')
-        col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+        # Sections dépliantes pour ajouter et supprimer des lignes et des colonnes
+        st.write('### Ajouter ou supprimer des lignes et des colonnes :')
 
-        with col1:
+        with st.expander("Ajouter une ligne", expanded=False):
             if st.button('Ajouter une ligne'):
                 new_row_data = {col: None for col in df.columns if col != 'Signature'}
                 new_row = pd.DataFrame([new_row_data])
@@ -64,7 +63,7 @@ if uploaded_file is not None:
                 st.session_state.modified_df = df.copy()
                 st.experimental_rerun()
 
-        with col2:
+        with st.expander("Ajouter une colonne", expanded=False):
             new_col_name = st.text_input('Nom de la nouvelle colonne', key='new_col')
             col_type = st.selectbox('Type de la nouvelle colonne', ['string', 'int', 'float'], key='new_col_type')
             if st.button("Ajouter une colonne") and new_col_name:
@@ -73,7 +72,7 @@ if uploaded_file is not None:
                 st.session_state.modified_df = df.copy()
                 st.experimental_rerun()
 
-        with col3:
+        with st.expander("Supprimer une ligne", expanded=False):
             row_to_delete = st.number_input('Index de la ligne à supprimer', min_value=0, max_value=len(df)-1, step=1, key='row_to_delete')
             if st.button("Supprimer une ligne"):
                 df = df.drop(index=row_to_delete).reset_index(drop=True)
@@ -81,7 +80,7 @@ if uploaded_file is not None:
                 st.session_state.modified_df = df.copy()
                 st.experimental_rerun()
 
-        with col4:
+        with st.expander("Supprimer une colonne", expanded=False):
             col_to_delete = st.selectbox('Colonne à supprimer', [col for col in df.columns if col != 'Signature'], key='col_to_delete')
             if st.button("Supprimer une colonne"):
                 df = df.drop(columns=[col_to_delete])
