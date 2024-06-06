@@ -52,8 +52,8 @@ if uploaded_file is not None:
             df = st.session_state.modified_df
 
         # Boutons pour les actions de fin
-        st.write('### Ajouter des lignes et des colonnes:')
-        col1, col2, col3 = st.columns([1, 1, 1])
+        st.write('### Ajouter ou supprimer des lignes et des colonnes:')
+        col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
 
         with col1:
             if st.button('Ajouter une ligne'):
@@ -74,15 +74,23 @@ if uploaded_file is not None:
                 st.experimental_rerun()
 
         with col3:
-            if st.button("Réinitialiser"):
-                if 'modifications' in st.session_state:
-                    st.session_state.modifications = []
-                if 'modified_df' in st.session_state:
-                    del st.session_state.modified_df
+            row_to_delete = st.number_input('Index de la ligne à supprimer', min_value=0, max_value=len(df)-1, step=1, key='row_to_delete')
+            if st.button("Supprimer une ligne"):
+                df = df.drop(index=row_to_delete).reset_index(drop=True)
+                df = ensure_signature_at_end(df)
+                st.session_state.modified_df = df.copy()
                 st.experimental_rerun()
 
-        # Afficher le DataFrame après ajout de lignes/colonnes
-        st.write('### DataFrame après ajout de lignes/colonnes :')
+        with col4:
+            col_to_delete = st.selectbox('Colonne à supprimer', [col for col in df.columns if col != 'Signature'], key='col_to_delete')
+            if st.button("Supprimer une colonne"):
+                df = df.drop(columns=[col_to_delete])
+                df = ensure_signature_at_end(df)
+                st.session_state.modified_df = df.copy()
+                st.experimental_rerun()
+
+        # Afficher le DataFrame après ajout/suppression de lignes/colonnes
+        st.write('### DataFrame après modifications :')
         st.dataframe(df)
 
         # Saisie de la modification
