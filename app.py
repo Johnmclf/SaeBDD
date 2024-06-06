@@ -37,15 +37,6 @@ if uploaded_file is not None:
             new_value = st.text_input('Entrez la nouvelle valeur')
             add_modification = st.form_submit_button('Ajouter la modification')
 
-        # Si l'index spécifié n'existe pas, ajoute une nouvelle ligne avec les valeurs vides
-        if row_index >= len(df):
-            new_row_data = {}
-            for column_name in df.columns:
-                if column_name != 'Signature':  # Ignorer la colonne 'Signature'
-                    new_row_data[column_name] = ""  # Laisser les nouvelles lignes vides pour le moment
-            df = df.append(new_row_data, ignore_index=True)
-            st.session_state.modifications.append((len(df)-1, None, None))  # Ajouter la nouvelle ligne à la liste des modifications
-
         # Ajouter la modification à la liste
         if add_modification:
             st.session_state.modifications.append((row_index, column_name, new_value))
@@ -63,7 +54,7 @@ if uploaded_file is not None:
                     st.experimental_rerun()
 
         # Boutons pour les actions de fin
-        col1, col2, col3 = st.columns([1, 1, 1])
+        col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
 
         with col1:
             if st.button('Appliquer toutes les modifications'):
@@ -103,6 +94,20 @@ if uploaded_file is not None:
                 if 'modifications' in st.session_state:
                     st.session_state.modifications = []
                 st.experimental_rerun()
+        
+        with col4:
+            if st.button("Ajouter une ligne"):
+                new_row_data = {col: "" for col in df.columns}
+                df = df.append(new_row_data, ignore_index=True)
+                st.write('DataFrame après ajout d\'une ligne :')
+                st.write(df)
+
+        if st.button("Ajouter une colonne"):
+            new_col_name = st.text_input('Nom de la nouvelle colonne')
+            if new_col_name:
+                df[new_col_name] = ""
+                st.write('DataFrame après ajout d\'une colonne :')
+                st.write(df)
 
         # Expander pour les options de téléchargement
         with st.expander("Télécharger les modifications", expanded=False):
@@ -147,3 +152,4 @@ if uploaded_file is not None:
                 )
 
             st.markdown('</div>', unsafe_allow_html=True)
+
