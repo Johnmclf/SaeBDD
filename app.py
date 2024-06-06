@@ -55,6 +55,10 @@ if uploaded_file is not None:
                     df[new_col_name] = 0
                 elif col_type == 'float':
                     df[new_col_name] = 0.0
+                # Réorganiser les colonnes pour que 'Signature' reste à la fin
+                if 'Signature' in df.columns:
+                    columns = [col for col in df.columns if col != 'Signature'] + ['Signature']
+                    df = df[columns]
                 st.session_state.modified_df = df.copy()
                 st.experimental_rerun()
 
@@ -173,4 +177,3 @@ if uploaded_file is not None:
                 )
 
             st.markdown('</div>', unsafe_allow_html=True)
-
