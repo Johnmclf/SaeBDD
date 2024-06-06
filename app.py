@@ -30,6 +30,37 @@ if uploaded_file is not None:
         if 'modifications' not in st.session_state:
             st.session_state.modifications = []
 
+        # Boutons pour les actions de fin
+        col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+
+        with col1:
+            if st.button('Ajouter une ligne'):
+                new_row_data = {col: None for col in df.columns if col != 'Signature'}
+                df = df.append(new_row_data, ignore_index=True)
+                st.session_state.modified_df = df.copy()
+                st.experimental_rerun()
+
+        with col2:
+            if st.button("Ajouter une colonne"):
+                new_col_name = st.text_input('Nom de la nouvelle colonne', key='new_col')
+                if new_col_name:
+                    df[new_col_name] = None
+                    st.session_state.modified_df = df.copy()
+                    st.experimental_rerun()
+
+        with col3:
+            if st.button("Réinitialiser"):
+                if 'modifications' in st.session_state:
+                    st.session_state.modifications = []
+                st.experimental_rerun()
+
+        # Afficher le DataFrame avec les nouvelles lignes/colonnes ajoutées
+        if 'modified_df' in st.session_state:
+            df = st.session_state.modified_df
+
+        st.write('DataFrame après ajout de lignes/colonnes :')
+        st.write(df)
+
         # Saisie de la modification
         with st.form(key='modification_form'):
             row_index = st.number_input('Entrez l\'index de la ligne à modifier', min_value=0, max_value=len(df)-1, step=1)
@@ -53,8 +84,8 @@ if uploaded_file is not None:
                     st.session_state.modifications.pop(i)
                     st.experimental_rerun()
 
-        # Boutons pour les actions de fin
-        col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+        # Boutons pour appliquer les modifications et ajouter la signature
+        col1, col2 = st.columns([1, 1])
 
         with col1:
             if st.button('Appliquer toutes les modifications'):
@@ -88,26 +119,6 @@ if uploaded_file is not None:
                         st.error("Veuillez appliquer les modifications avant d'ajouter une signature.")
                 else:
                     st.error("Veuillez entrer votre nom pour ajouter une signature.")
-
-        with col3:
-            if st.button("Réinitialiser"):
-                if 'modifications' in st.session_state:
-                    st.session_state.modifications = []
-                st.experimental_rerun()
-        
-        with col4:
-            if st.button("Ajouter une ligne"):
-                new_row_data = {col: "" for col in df.columns}
-                df = df.append(new_row_data, ignore_index=True)
-                st.write('DataFrame après ajout d\'une ligne :')
-                st.write(df)
-
-        if st.button("Ajouter une colonne"):
-            new_col_name = st.text_input('Nom de la nouvelle colonne')
-            if new_col_name:
-                df[new_col_name] = ""
-                st.write('DataFrame après ajout d\'une colonne :')
-                st.write(df)
 
         # Expander pour les options de téléchargement
         with st.expander("Télécharger les modifications", expanded=False):
@@ -152,4 +163,5 @@ if uploaded_file is not None:
                 )
 
             st.markdown('</div>', unsafe_allow_html=True)
+
 
