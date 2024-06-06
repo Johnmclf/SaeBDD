@@ -36,17 +36,17 @@ if uploaded_file is not None:
         with col1:
             if st.button('Ajouter une ligne'):
                 new_row_data = {col: None for col in df.columns if col != 'Signature'}
-                df = df.append(new_row_data, ignore_index=True)
+                new_row = pd.DataFrame([new_row_data])
+                df = pd.concat([df, new_row], ignore_index=True)
                 st.session_state.modified_df = df.copy()
                 st.experimental_rerun()
 
         with col2:
-            if st.button("Ajouter une colonne"):
-                new_col_name = st.text_input('Nom de la nouvelle colonne', key='new_col')
-                if new_col_name:
-                    df[new_col_name] = None
-                    st.session_state.modified_df = df.copy()
-                    st.experimental_rerun()
+            new_col_name = st.text_input('Nom de la nouvelle colonne', key='new_col')
+            if st.button("Ajouter une colonne") and new_col_name:
+                df[new_col_name] = None
+                st.session_state.modified_df = df.copy()
+                st.experimental_rerun()
 
         with col3:
             if st.button("Réinitialiser"):
@@ -163,5 +163,3 @@ if uploaded_file is not None:
                 )
 
             st.markdown('</div>', unsafe_allow_html=True)
-
-
