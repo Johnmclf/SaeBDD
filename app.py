@@ -74,6 +74,9 @@ if uploaded_file is not None:
                 st.write('DataFrame modifié :')
                 st.write(df)
 
+                # Sauvegarder le DataFrame modifié sans signature
+                st.session_state.modified_df = df.copy()
+
                 # Réinitialiser la liste des modifications
                 st.session_state.modifications = []
 
@@ -81,10 +84,17 @@ if uploaded_file is not None:
             user_name = st.text_input("Votre nom")
             if st.button("Ajouter Signature"):
                 if user_name:
-                    signature = f"Modifié par {user_name} le {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-                    df.at[0, 'Signature'] = signature
-                    st.write('DataFrame avec signature :')
-                    st.write(df)
+                    if 'modified_df' in st.session_state:
+                        df_with_signature = st.session_state.modified_df.copy()
+                        signature = f"Modifié par {user_name} le {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                        df_with_signature.at[0, 'Signature'] = signature
+                        st.write('DataFrame avec signature :')
+                        st.write(df_with_signature)
+                        
+                        # Mettre à jour le DataFrame stocké avec la signature
+                        st.session_state.modified_df = df_with_signature
+                    else:
+                        st.error("Veuillez appliquer les modifications avant d'ajouter une signature.")
                 else:
                     st.error("Veuillez entrer votre nom pour ajouter une signature.")
 
@@ -109,30 +119,31 @@ if uploaded_file is not None:
             )
             st.markdown('<div class="small-button">', unsafe_allow_html=True)
 
-            modified_json = df.to_json(orient='records', indent=2)
-            modified_csv = df.to_csv(index=False).encode('utf-8')
+            if 'modified_df' in st.session_state:
+                modified_json = st.session_state.modified_df.to_json(orient='records', indent=2)
+                modified_csv = st.session_state.modified_df.to_csv(index=False).encode('utf-8')
 
-            buffer = io.BytesIO()
-            df.to_parquet(buffer, index=False)
-            modified_parquet = buffer.getvalue()
+                buffer = io.BytesIO()
+                st.session_state.modified_df.to_parquet(buffer, index=False)
+                modified_parquet = buffer.getvalue()
 
-            st.download_button(
-                label="Télécharger en JSON",
-                data=modified_json,
-                file_name="modified_data.json",
-                mime="application/json"
-            )
-            st.download_button(
-                label="Télécharger en CSV",
-                data=modified_csv,
-                file_name="modified_data.csv",
-                mime="text/csv"
-            )
-            st.download_button(
-                label="Télécharger en Parquet",
-                data=modified_parquet,
-                file_name="modified_data.parquet",
-                mime="application/octet-stream"
-            )
+                st.download_button(
+                    label="Télécharger en JSON",
+                    data=modified_json,
+                    file_name="modified_data.json",
+                    mime="application/json"
+                )
+                st.download_button(
+                    label="Télécharger en CSV",
+                    data=modified_csv,
+                    file_name="modified_data.csv",
+                    mime="text/csv"
+                )
+                st.download_button(
+                    label="Télécharger en Parquet",
+                    data=modified_parquet,
+                    file_name="modified_data.parquet",
+                    mime="application/octet-stream"
+                )
 
             st.markdown('</div>', unsafe_allow_html=True)
