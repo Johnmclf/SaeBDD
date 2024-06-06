@@ -30,6 +30,10 @@ if uploaded_file is not None:
         if 'modifications' not in st.session_state:
             st.session_state.modifications = []
 
+        # Charger le DataFrame modifié stocké dans session_state s'il existe
+        if 'modified_df' in st.session_state:
+            df = st.session_state.modified_df
+
         # Boutons pour les actions de fin
         col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
 
@@ -43,8 +47,14 @@ if uploaded_file is not None:
 
         with col2:
             new_col_name = st.text_input('Nom de la nouvelle colonne', key='new_col')
+            col_type = st.selectbox('Type de la nouvelle colonne', ['string', 'int', 'float'], key='new_col_type')
             if st.button("Ajouter une colonne") and new_col_name:
-                df[new_col_name] = None
+                if col_type == 'string':
+                    df[new_col_name] = ""
+                elif col_type == 'int':
+                    df[new_col_name] = 0
+                elif col_type == 'float':
+                    df[new_col_name] = 0.0
                 st.session_state.modified_df = df.copy()
                 st.experimental_rerun()
 
@@ -163,3 +173,4 @@ if uploaded_file is not None:
                 )
 
             st.markdown('</div>', unsafe_allow_html=True)
+
