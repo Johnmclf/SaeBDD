@@ -149,48 +149,48 @@ if uploaded_file is not None:
                 <style>
                 .small-button button {
                     font-size: 0.8em
-                !important;
-                    padding: 0.25em 0.5em !important;
-                }
-                </style>
-                """,
-                unsafe_allow_html=True
-            )
-            st.markdown('<div class="small-button">', unsafe_allow_html=True)
-    
-            if 'modified_df' in st.session_state:
-                modified_json = st.session_state.modified_df.to_json(orient='records', indent=2)
-                modified_csv = st.session_state.modified_df.to_csv(index=False).encode('utf-8')
-    
-                try:
-                    buffer = io.BytesIO()
-                    # Convertir explicitement les colonnes en types compatibles
-                    for col in st.session_state.modified_df.columns:
-                        if st.session_state.modified_df[col].dtype == 'object':
-                            st.session_state.modified_df[col] = st.session_state.modified_df[col].astype('string')
-    
-                    st.session_state.modified_df.to_parquet(buffer, index=False)
-                    modified_parquet = buffer.getvalue()
-    
-                    st.download_button(
-                        label="Télécharger en JSON",
-                        data=modified_json,
-                        file_name="modified_data.json",
-                        mime="application/json"
-                    )
-                    st.download_button(
-                        label="Télécharger en CSV",
-                        data=modified_csv,
-                        file_name="modified_data.csv",
-                        mime="text/csv"
-                    )
-                    st.download_button(
-                        label="Télécharger en Parquet",
-                        data=modified_parquet,
-                        file_name="modified_data.parquet",
-                        mime="application/octet-stream"
-                    )
-                except Exception as e:
-                    st.error(f"Erreur lors de la conversion en Parquet: {e}")
-    
-            st.markdown('</div>', unsafe_allow_html=True)
+                    !important;
+                        padding: 0.25em 0.5em !important;
+                    }
+                    </style>
+                    """,
+                    unsafe_allow_html=True
+                )
+                st.markdown('<div class="small-button">', unsafe_allow_html=True)
+        
+                if 'modified_df' in st.session_state:
+                    modified_json = st.session_state.modified_df.to_json(orient='records', indent=2)
+                    modified_csv = st.session_state.modified_df.to_csv(index=False).encode('utf-8')
+        
+                    try:
+                        buffer = io.BytesIO()
+                        # Convertir explicitement les colonnes en types compatibles
+                        for col in st.session_state.modified_df.columns:
+                            if st.session_state.modified_df[col].dtype == 'object':
+                                st.session_state.modified_df[col] = st.session_state.modified_df[col].astype('string')
+        
+                        st.session_state.modified_df.to_parquet(buffer, index=False)
+                        modified_parquet = buffer.getvalue()
+        
+                        st.download_button(
+                            label="Télécharger en JSON",
+                            data=modified_json,
+                            file_name="modified_data.json",
+                            mime="application/json"
+                        )
+                        st.download_button(
+                            label="Télécharger en CSV",
+                            data=modified_csv,
+                            file_name="modified_data.csv",
+                            mime="text/csv"
+                        )
+                        st.download_button(
+                            label="Télécharger en Parquet",
+                            data=modified_parquet,
+                            file_name="modified_data.parquet",
+                            mime="application/octet-stream"
+                        )
+                    except Exception as e:
+                        st.error(f"Erreur lors de la conversion en Parquet: {e}")
+        
+                st.markdown('</div>', unsafe_allow_html=True)
