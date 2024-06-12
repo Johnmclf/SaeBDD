@@ -69,7 +69,7 @@ if uploaded_file is not None:
 
         with st.expander("Ajouter une colonne", expanded=False):
             new_col_name = st.text_input('Nom de la nouvelle colonne', key='new_col')
-            col_type = st.selectbox('Type de la nouvelle colonne', ['string', 'int', 'float'], key='new_col_type')
+            col_type = st.selectbox('Type de la nouvelle colonne', ['string', 'int', 'float', 'bool'], key='new_col_type')
             if st.button("Ajouter une colonne") and new_col_name:
                 df = add_column(df, new_col_name, col_type)
                 df = ensure_signature_at_end(df)
