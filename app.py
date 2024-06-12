@@ -4,6 +4,9 @@ import json
 import io
 from datetime import datetime
 
+#---------------------------------------------------Titre--------------------------------------------------------------
+st.markdown("<h1 style='text-align: center;'>Update</h1>", unsafe_allow_html=True)
+
 #--------------------------------------------------------Lire les fichiers-----------------------------------------------------------------------(valider)
 def load_file(file):
     if file.name.endswith('.json'):
