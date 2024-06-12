@@ -214,4 +214,3 @@ if uploaded_file is not None:
                     st.error(f"Erreur lors de la conversion en Parquet: {e}")
 
             st.markdown('</div>', unsafe_allow_html=True)
-
