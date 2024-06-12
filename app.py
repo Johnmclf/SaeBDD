@@ -208,7 +208,6 @@ if uploaded_file is not None:
                             st.session_state.modified_df[col] = st.session_state.modified_df[col].astype('string')
 
                     st.session_state.modified_df.to_parquet(buffer, index=False)
-                    modifiedst.session_state.modified_df.to_parquet(buffer, index=False)
                     modified_parquet = buffer.getvalue()
 
                     st.download_button(
@@ -218,7 +217,7 @@ if uploaded_file is not None:
                         mime="application/json"
                     )
                     st.download_button(
-                        label="Télécharger en CSV",
+                                            label="Télécharger en CSV",
                         data=modified_csv,
                         file_name="modified_data.csv",
                         mime="text/csv"
