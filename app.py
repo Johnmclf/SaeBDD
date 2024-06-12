@@ -103,7 +103,20 @@ if uploaded_file is not None:
         with st.form(key='modification_form'):
             row_index = st.number_input('Entrez l\'index de la ligne à modifier', min_value=0, max_value=len(df)-1, step=1)
             column_name = st.selectbox('Choisissez le nom de la colonne à modifier', df.columns)
-            new_value = st.text_input('Entrez la nouvelle valeur')
+
+            # Déterminer le type de la colonne sélectionnée
+            col_type = df[column_name].dtype
+
+            # Afficher le widget approprié pour le type de colonne
+            if col_type == 'int64':
+                new_value = st.number_input('Entrez la nouvelle valeur', step=1, format='%d')
+            elif col_type == 'float64':
+                new_value = st.number_input('Entrez la nouvelle valeur', format='%f')
+            elif col_type == 'bool':
+                new_value = st.selectbox('Entrez la nouvelle valeur', [True, False])
+            else:
+                new_value = st.text_input('Entrez la nouvelle valeur')
+
             add_modification = st.form_submit_button('Ajouter la modification')
 
         #-----------------------------------------------------------------Ajouter la modification à la liste------------------------------------------------
