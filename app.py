@@ -100,28 +100,31 @@ if uploaded_file is not None:
 
         # Saisie de la modification
         st.write('### Modifications des valeurs:')
+        
+        # Widget pour sélectionner la colonne à modifier
+        column_name = st.selectbox('Choisissez le nom de la colonne à modifier', df.columns, key='selected_column')
+
+        # Déterminer le type de la colonne sélectionnée
+        col_type = df[column_name].dtype
+
+        # Afficher le widget approprié pour le type de colonne
+        if col_type == 'int64':
+            new_value = st.number_input('Entrez la nouvelle valeur', step=1, format='%d')
+        elif col_type == 'float64':
+            new_value = st.number_input('Entrez la nouvelle valeur', format='%f')
+        elif col_type == 'bool':
+            new_value = st.selectbox('Entrez la nouvelle valeur', [True, False])
+        else:
+            new_value = st.text_input('Entrez la nouvelle valeur')
+
         with st.form(key='modification_form'):
-            row_index = st.number_input('Entrez l\'index de la ligne à modifier', min_value=0, max_value=len(df)-1, step=1)
-            column_name = st.selectbox('Choisissez le nom de la colonne à modifier', df.columns)
-
-            # Déterminer le type de la colonne sélectionnée
-            col_type = df[column_name].dtype
-
-            # Afficher le widget approprié pour le type de colonne
-            if col_type == 'int64':
-                new_value = st.number_input('Entrez la nouvelle valeur', step=1, format='%d')
-            elif col_type == 'float64':
-                new_value = st.number_input('Entrez la nouvelle valeur', format='%f')
-            elif col_type == 'bool':
-                new_value = st.selectbox('Entrez la nouvelle valeur', [True, False])
-            else:
-                new_value = st.text_input('Entrez la nouvelle valeur')
-
+            row_index = st.number_input('Entrez l\'index de la ligne à modifier', min_value=0, max_value=len(df)-1, step=1, key='row_index')
             add_modification = st.form_submit_button('Ajouter la modification')
 
         #-----------------------------------------------------------------Ajouter la modification à la liste------------------------------------------------
         if add_modification:
             st.session_state.modifications.append((row_index, column_name, new_value))
+            st.experimental_rerun()
 
         #---------------------------------------------------------------- Afficher la liste des modifications en attente------------------------------------
         st.write('### Modifications en attente :')
@@ -205,6 +208,7 @@ if uploaded_file is not None:
                             st.session_state.modified_df[col] = st.session_state.modified_df[col].astype('string')
 
                     st.session_state.modified_df.to_parquet(buffer, index=False)
+                    modified st.session_state.modified_df.to_parquet(buffer, index=False)
                     modified_parquet = buffer.getvalue()
 
                     st.download_button(
