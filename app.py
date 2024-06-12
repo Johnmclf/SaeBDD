@@ -29,6 +29,8 @@ def add_column(df, col_name, col_type):
         df[col_name] = 0
     elif col_type == 'float':
         df[col_name] = 0.0
+    elif col_type == 'bool':
+        df[col_name] = False
     return df
 
 #-------------------------------------------------Signature à la fin----------------------------------------------------------------------------
