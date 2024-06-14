@@ -3,6 +3,20 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import streamlit as st
 
+def extract_numbers(text):
+    """
+    Fonction pour extraire les numéros de l'EuroMillions à partir du texte.
+    """
+    # Séparer le texte en lignes
+    lines = text.split('\n')
+    numbers = []
+    for line in lines:
+        # Rechercher les lignes contenant les numéros de l'EuroMillions
+        if "EuroMillions - Tirage" in line:
+            numbers_line = line.split(":")[-1].strip()
+            numbers.extend(numbers_line.split(" "))
+    return numbers
+
 # URL de la page des résultats
 url = "https://www.lesbonsnumeros.com/loto/resultats/tirages.htm"
 
@@ -13,37 +27,31 @@ if response.status_code != 200:
 else:
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    # Trouver tous les tableaux de résultats
-    results_table = soup.find('table', {'class': 'historique'})
+    # Trouver tous les paragraphes contenant les informations de tirage
+    draw_paragraphs = soup.find_all('p')
 
-    if not results_table:
-        st.error("Le tableau des résultats n'a pas été trouvé sur la page.")
-    else:
-        # Initialiser une liste pour stocker les données
-        data = []
+    # Initialiser une liste pour stocker les données de tous les tirages
+    all_draws_data = []
 
-        # Parcourir chaque ligne du tableau
-        for row in results_table.find_all('tr'):
-            # Initialiser un dictionnaire pour stocker les informations de chaque ligne
-            row_data = {}
-            cells = row.find_all('td')
-            if len(cells) == 9:  # Assurer que la ligne contient les bons nombres de colonnes
-                # Extraire les informations de chaque colonne
-                row_data['date'] = cells[0].text.strip()
-                row_data['boule_1'] = cells[1].text.strip()
-                row_data['boule_2'] = cells[2].text.strip()
-                row_data['boule_3'] = cells[3].text.strip()
-                row_data['boule_4'] = cells[4].text.strip()
-                row_data['boule_5'] = cells[5].text.strip()
-                row_data['chance'] = cells[6].text.strip()
-                
-                # Ajouter le dictionnaire à la liste de données
-                data.append(row_data)
+    # Parcourir chaque paragraphe
+    for paragraph in draw_paragraphs:
+        # Extraire le texte du paragraphe
+        paragraph_text = paragraph.get_text()
+        # Extraire la date du tirage (si disponible)
+        if "EuroMillions - Tirage du " in paragraph_text:
+            draw_date = paragraph_text.split(" - ")[1].split(":")[0]
+            draw_numbers = extract_numbers(paragraph_text)
+            draw_data = {
+                'Date': draw_date,
+                'Numéros': ' '.join(draw_numbers[:5]),  # Les cinq premiers sont les numéros principaux
+                'Étoiles': ' '.join(draw_numbers[5:])  # Les étoiles
+            }
+            all_draws_data.append(draw_data)
 
-        # Convertir la liste de données en DataFrame pandas
-        df = pd.DataFrame(data)
+    # Convertir la liste de données en DataFrame pandas
+    df = pd.DataFrame(all_draws_data)
 
-        # Afficher le DataFrame avec Streamlit
-        st.title("Résultats de l'EuroMillions")
-        st.write("Tableau des résultats des tirages de l'EuroMillions depuis novembre 2009")
-        st.dataframe(df)
+    # Afficher le DataFrame avec Streamlit
+    st.title("Résultats de l'EuroMillions")
+    st.write("Liste des tirages de l'EuroMillions depuis novembre 2009")
+    st.dataframe(df)
