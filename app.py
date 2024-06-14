@@ -49,8 +49,11 @@ def main():
                 # Création du DataFrame pour afficher les résultats
                 df_resultats = pd.DataFrame(comptages.items(), columns=['Chiffre', 'Nombre de fois'])
                 
-                # Affichage des résultats
-                st.write("Nombre de chaque chiffre de 1 à 50 dans les colonnes sélectionnées :")
+                # Tri par ordre croissant du nombre de fois
+                df_resultats = df_resultats.sort_values(by='Nombre de fois')
+                
+                # Affichage des résultats triés
+                st.write("Nombre de chaque chiffre de 1 à 50 dans les colonnes sélectionnées (trié par ordre croissant) :")
                 st.write(df_resultats)
             else:
                 st.warning("Veuillez sélectionner au moins une colonne pour l'analyse.")
