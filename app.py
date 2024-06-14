@@ -13,8 +13,17 @@ def lire_csv_vers_dataframe(nom_fichier, separateur=';'):
         st.error("Une erreur s'est produite lors de la lecture du fichier :", e)
         return None
 
+def compter_chiffres(dataframe, colonnes):
+    comptages = {}
+    for chiffre in range(1, 51):  # Boucle de 1 à 50
+        total = 0
+        for colonne in colonnes:
+            total += (dataframe[colonne] == chiffre).sum()
+        comptages[chiffre] = total
+    return comptages
+
 def main():
-    st.title("Chargement de fichier CSV dans DataFrame")
+    st.title("Analyse des chiffres dans les colonnes sélectionnées")
 
     # Widget pour uploader le fichier CSV
     fichier = st.file_uploader("Uploader un fichier CSV", type=['csv'])
@@ -24,11 +33,27 @@ def main():
     if fichier is not None:
         separateur = st.text_input("Entrez le séparateur utilisé dans le fichier CSV (par défaut ';')", ';')
 
-        # Lecture du fichier CSV et affichage du DataFrame
+        # Lecture du fichier CSV
         dataframe = lire_csv_vers_dataframe(fichier, separateur)
+        
         if dataframe is not None:
-            st.success("Fichier chargé avec succès ! Voici les données :")
-            st.write(dataframe)
+            st.success("Fichier chargé avec succès !")
+            
+            # Sélection des colonnes par l'utilisateur
+            colonnes_selectionnees = st.multiselect("Sélectionnez les colonnes pour l'analyse", dataframe.columns)
+            
+            if colonnes_selectionnees:
+                # Compter le nombre de chaque chiffre de 1 à 50 dans les colonnes sélectionnées
+                comptages = compter_chiffres(dataframe, colonnes_selectionnees)
+                
+                # Création du DataFrame pour afficher les résultats
+                df_resultats = pd.DataFrame(comptages.items(), columns=['Chiffre', 'Nombre de fois'])
+                
+                # Affichage des résultats
+                st.write("Nombre de chaque chiffre de 1 à 50 dans les colonnes sélectionnées :")
+                st.write(df_resultats)
+            else:
+                st.warning("Veuillez sélectionner au moins une colonne pour l'analyse.")
 
 if __name__ == "__main__":
     main()
